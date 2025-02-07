@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Be My Valentine?</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #ffcccc;
+            overflow: hidden;
+        }
+
+        h1 {
+            color: red;
+            font-size: 40px;
+            margin-top: 50px;
+        }
+
+        .question {
+            font-size: 24px;
+            margin: 20px 0;
+        }
+
+        .buttons {
+            margin: 20px;
+        }
+
+        button {
+            font-size: 20px;
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .yes-btn {
+            background-color: #ff4d4d;
+            color: white;
+        }
+
+        .no-btn {
+            background-color: #333;
+            color: white;
+        }
+        .yes-btnb {
+            background-color: #333;
+            color: white;
+        }
+
+        .no-btnb {
+            background-color: #ff4d4d;
+            color: white;
+        }
+
+        .input-box {
+            display: none;
+            margin-top: 20px;
+        }
+
+        input, textarea {
+            width: 80%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .submit-btn {
+            background-color: #ff4d4d;
+            color: white;
+            display: block;
+            margin: 10px auto;
+        }
+
+        /* Floating Hearts */
+        .heart {
+            position: absolute;
+            color: red;
+            font-size: 30px;
+            animation: floatUp 5s linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-500px); opacity: 0; }
+        }
+    </style>
+    
+</head>
+<body>
+
+    <!-- Ask for Name -->
+<div id="name-box">
+    <p>Hey there! What's your name? 😊</p>
+    <input type="text" id="name" placeholder="Enter your name">
+    <button class="submit-btn" onclick="startValentine()">SubmitName</button>
+</div>
+
+<!-- Valentine Question (Initially Hidden) -->
+<div id="valentine-box" style="display: none;">
+    <h1>Will you be my Valentine, <span id="person-name"></span>? ❤️</h1>
+    <p class="question">Please say yes! 😊</p>
+    <div class="buttons">
+        <button class="yes-btn" onclick="handleYes()">Yes ❤️</button>
+        <button class="no-btn" onclick="handleNo()">No 💔</button>
+    </div>
+</div>
+
+    <!-- Input for location -->
+    <div class="input-box" id="location-box">
+        <p>Where should we meet? 😊</p>
+        <input type="text" id="location" placeholder="Enter a location">
+        <button class="submit-btn" onclick="storeResponse('yes')">Submit</button>
+    </div>
+
+    <!-- Confirmation for No -->
+    <div class="input-box" id="confirm-no-box">
+        <p>Are you sure? 😢</p>
+        <button class="yes-btnb" onclick="askReason()">Yes 💔</button>
+        <button class="no-btnb" onclick="reset()">No ❤️</button>
+    </div>
+
+    <!-- Input for reason -->
+    <div class="input-box" id="reason-box">
+        <p>Why not? 😭</p>
+        <textarea id="reason" placeholder="Type your reason here..."></textarea>
+        <button class="submit-btn" onclick="storeResponse('no')">Submit</button>
+    </div>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js";
+  import { getDatabase, ref, set, push, get, onValue } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js";
+  const firebaseConfig = {
+    apiKey: "AIzaSyCTpuuFPDK3sZ2HfWdcGbL4ThnJJfembF8",
+    authDomain: "valentine-invit.firebaseapp.com",
+    databaseURL: "https://valentine-invit-default-rtdb.firebaseio.com",
+    projectId: "valentine-invit",
+    storageBucket: "valentine-invit.firebasestorage.app",
+    messagingSenderId: "1052195612421",
+    appId: "1:1052195612421:web:cf6f2ca8fe55752cc5f96c"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+  let personName = "";
+
+  function startValentine() {
+    let nameInput = document.getElementById("name").value.trim();
+    if (nameInput === "") {
+      alert("Please enter your name! 😊");
+      return;
+    }
+    personName = nameInput;
+    document.getElementById("person-name").innerText = personName;
+    document.getElementById("name-box").style.display = "none";
+    document.getElementById("valentine-box").style.display = "block";
+  }
+
+  function handleYes() {
+    document.getElementById("location-box").style.display = "block";
+    document.querySelector(".buttons").style.display = "none";
+  }
+
+  function handleNo() {
+    document.getElementById("confirm-no-box").style.display = "block";
+    document.querySelector(".buttons").style.display = "none";
+  }
+
+  function askReason() {
+    document.getElementById("confirm-no-box").style.display = "none";
+    document.getElementById("reason-box").style.display = "block";
+  }
+
+  function reset() {
+    document.getElementById("confirm-no-box").style.display = "none";
+    document.querySelector(".buttons").style.display = "block";
+  }
+
+  function storeResponse(answer) {
+    if (personName === "") {
+      alert("Please enter your name first!");
+      return;
+    }
+    let responseref = ref(db, 'responses')
+    if (answer === "yes") {
+      let location = document.getElementById("location").value.trim();
+      if (location === "") {
+        alert("Please enter a location!");
+        return;
+      }
+      push(responseref,{
+        name: personName,
+        answer: "yes",
+        location: location,
+        timestamp: Date.now()
+      });
+      alert("Yay! See you at " + location + " ❤️");
+    } else {
+      let reason = document.getElementById("reason").value.trim();
+      if (reason === "") {
+        alert("Please enter a reason!");
+        return;
+      }
+      push(responseref, {
+        name: personName,
+        answer: "no",
+        reason: reason,
+        timestamp: Date.now()
+      });
+      alert("Aww 😢. Thanks for telling me.");
+    }
+  }
+
+  // Floating Hearts Effect
+  function createHeart() {
+    let heart = document.createElement("div");
+    heart.innerHTML = "❤️";
+    heart.classList.add("heart");
+    document.body.appendChild(heart);
+
+    let left = Math.random() * window.innerWidth;
+    let size = Math.random() * 30 + 10;
+    let duration = Math.random() * 3 + 2;
+
+    heart.style.left = left + "px";
+    heart.style.fontSize = size + "px";
+    heart.style.animationDuration = duration + "s";
+
+    setTimeout(() => {
+      heart.remove();
+    }, duration * 1000);
+  }
+
+  setInterval(createHeart, 500);
+  
+  window.startValentine = startValentine;
+  window.handleYes = handleYes;
+window.handleNo = handleNo;
+window.askReason = askReason;
+window.reset = reset;
+window.storeResponse = storeResponse;
+</script>
+</body>
+  </html>
