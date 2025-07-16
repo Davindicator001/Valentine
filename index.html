@@ -91,15 +91,13 @@
     
 </head>
 <body>
-
-    <!-- Ask for Name -->
+    
 <div id="name-box">
     <p>Hey there! What's your name? 😊</p>
     <input type="text" id="name" placeholder="Enter your name">
     <button class="submit-btn" onclick="startValentine()">SubmitName</button>
 </div>
 
-<!-- Valentine Question (Initially Hidden) -->
 <div id="valentine-box" style="display: none;">
     <h1>Will you be my Valentine, <span id="person-name"></span>? ❤️</h1>
     <p class="question">Please say yes! 😊</p>
@@ -109,21 +107,18 @@
     </div>
 </div>
 
-    <!-- Input for location -->
     <div class="input-box" id="location-box">
         <p>Where should we meet? 😊</p>
         <input type="text" id="location" placeholder="Enter a location">
         <button class="submit-btn" onclick="storeResponse('yes')">Submit</button>
     </div>
 
-    <!-- Confirmation for No -->
     <div class="input-box" id="confirm-no-box">
         <p>Are you sure? 😢</p>
         <button class="yes-btnb" onclick="askReason()">Yes 💔</button>
         <button class="no-btnb" onclick="reset()">No ❤️</button>
     </div>
 
-    <!-- Input for reason -->
     <div class="input-box" id="reason-box">
         <p>Why not? 😭</p>
         <textarea id="reason" placeholder="Type your reason here..."></textarea>
@@ -132,9 +127,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
 <script type="module">
-  // Import the functions you need from the SDKs you need
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js";
   import { getDatabase, ref, set, push, get, onValue } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js";
+    //free for all
   const firebaseConfig = {
     apiKey: "AIzaSyCTpuuFPDK3sZ2HfWdcGbL4ThnJJfembF8",
     authDomain: "valentine-invit.firebaseapp.com",
@@ -145,7 +140,6 @@
     appId: "1:1052195612421:web:cf6f2ca8fe55752cc5f96c"
   };
 
-  // Initialize Firebase
   const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
   let personName = "";
@@ -217,7 +211,6 @@ const db = getDatabase(app);
     }
   }
 
-  // Floating Hearts Effect
   function createHeart() {
     let heart = document.createElement("div");
     heart.innerHTML = "❤️";
